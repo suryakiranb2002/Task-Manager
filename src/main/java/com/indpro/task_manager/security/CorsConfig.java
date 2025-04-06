@@ -16,6 +16,14 @@ public class CorsConfig {
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
+                registry.addMapping("/api/v1/tasks/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*");
+                registry.addMapping("/me")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET")
+                        .allowedHeaders("*");
             }
         };
     }

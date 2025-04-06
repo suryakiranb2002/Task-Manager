@@ -3,9 +3,13 @@ package com.indpro.task_manager.controller;
 import com.indpro.task_manager.Request.*;
 import com.indpro.task_manager.entity.User;
 import com.indpro.task_manager.service.IUserService;
+import com.indpro.task_manager.wrapper.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,14 +17,21 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
-
     @GetMapping("/me")
-    public ResponseEntity<UserProfileDTO> getMyProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserProfileDTO> getMyProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
         UserProfileDTO profile = new UserProfileDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getEmail()
+                userDetails.getUserEntity().getId(),
+                userDetails.getUserEntity().getFirstName(),
+                userDetails.getUserEntity().getEmail()
         );
+
         return ResponseEntity.ok(profile);
     }
 
